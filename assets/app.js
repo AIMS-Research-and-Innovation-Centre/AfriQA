@@ -2,7 +2,7 @@
   "use strict";
 
   var APP_CONFIG = {
-    appsScriptUrl: "https://script.google.com/macros/s/AKfycbws-NWcwenRceDayw5JcHZLcO2kh-nq-E53U-Ivnb0eyfUYtvMfTRtF_fec6yvhT8Kf/exec",
+    appsScriptUrl: "https://script.google.com/macros/s/AKfycbzxzG2n4NZXfCZIvAZXGpO2K-69ULbkRPA8596iBxU4gslK5mAWXmPVIxuiitdw-BMd/exec",
     siteUrl: "https://aims-research-and-innovation-centre.github.io/AfriQA/",
     storageKey: "afriqa-2026-portal-state"
   };
