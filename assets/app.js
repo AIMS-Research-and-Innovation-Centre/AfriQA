@@ -375,6 +375,9 @@
   function activatePortalTab(tabName) {
     qsa(".portal-tab").forEach(function (item) {
       item.classList.toggle("active", item.dataset.tab === tabName);
+      if (item.dataset.tab === tabName) {
+        item.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      }
     });
     qsa(".portal-panel").forEach(function (panel) {
       panel.classList.toggle("active", panel.dataset.panel === tabName);

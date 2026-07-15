@@ -26,6 +26,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -37,6 +38,7 @@ body {
   background-size: 44px 44px, 44px 44px, auto;
   color: var(--ink);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 body.nav-open {
@@ -64,6 +66,8 @@ input,
 textarea,
 select {
   width: 100%;
+  min-width: 0;
+  min-height: 46px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--paper-strong);
@@ -164,6 +168,7 @@ code {
   object-fit: contain;
   height: auto;
   display: block;
+  flex: 0 1 auto;
 }
 
 .brand-logo-aims {
@@ -179,6 +184,7 @@ code {
 .brand-divider {
   width: 1px;
   height: 42px;
+  flex: 0 0 auto;
   background: var(--line-strong);
 }
 
@@ -205,6 +211,7 @@ code {
 
 .nav-toggle {
   display: none;
+  flex: 0 0 auto;
   width: 42px;
   height: 42px;
   border: 1px solid var(--line);
@@ -336,11 +343,14 @@ h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  max-width: 100%;
   min-height: 44px;
   border: 1px solid transparent;
   border-radius: 6px;
   padding: 0.78rem 1rem;
   text-decoration: none;
+  text-align: center;
+  line-height: 1.2;
   font-weight: 850;
   cursor: pointer;
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease;
@@ -1025,6 +1035,7 @@ h3 {
   color: var(--red-strong);
   padding: 0.9rem 1rem;
   font-weight: 780;
+  overflow-wrap: anywhere;
 }
 
 .portal-notice.is-online {
@@ -1038,6 +1049,7 @@ h3 {
   grid-template-columns: 230px minmax(0, 1fr);
   gap: 1rem;
   padding: 0 1.25rem;
+  min-width: 0;
 }
 
 .portal-sidebar {
@@ -1047,6 +1059,7 @@ h3 {
   display: grid;
   gap: 0.35rem;
   padding: 0.75rem;
+  min-width: 0;
 }
 
 .portal-tab {
@@ -1058,6 +1071,7 @@ h3 {
   text-align: left;
   font-weight: 850;
   cursor: pointer;
+  min-height: 44px;
 }
 
 .portal-tab:hover,
@@ -1070,10 +1084,12 @@ h3 {
 .portal-panels {
   min-height: 640px;
   padding: 1.1rem;
+  min-width: 0;
 }
 
 .portal-panel {
   display: none;
+  scroll-margin-top: calc(var(--header-h) + 1rem);
 }
 
 .portal-panel.active {
@@ -1086,11 +1102,17 @@ h3 {
   align-items: start;
   gap: 1rem;
   margin-bottom: 1.2rem;
+  min-width: 0;
+}
+
+.panel-header > * {
+  min-width: 0;
 }
 
 .status-pill {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   min-height: 30px;
   border-radius: 5px;
   background: var(--teal-soft);
@@ -1126,6 +1148,7 @@ h3 {
     linear-gradient(135deg, rgba(30, 111, 120, 0.12), rgba(159, 47, 36, 0.06)),
     var(--paper-strong);
   padding: 1rem;
+  overflow-wrap: anywhere;
 }
 
 .portal-success h4 {
@@ -1246,7 +1269,9 @@ h3 {
 }
 
 .table-wrap {
+  max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--line);
   border-radius: var(--radius);
 }
@@ -1451,9 +1476,15 @@ td {
   .portal-sidebar {
     display: flex;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 1rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
   }
 
   .portal-tab {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
     white-space: nowrap;
   }
 
@@ -1520,6 +1551,39 @@ td {
     padding: 4rem 1rem;
   }
 
+  .portal-section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .portal-section > .section-heading {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .portal-notice {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .portal-grid {
+    gap: 0.85rem;
+    padding: 0 0.75rem;
+  }
+
+  .portal-sidebar {
+    margin: 0 -0.75rem;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: rgba(255, 253, 248, 0.78);
+    padding: 0.45rem 0.75rem;
+  }
+
+  .portal-tab {
+    padding: 0.68rem 0.75rem;
+  }
+
   .hero-grid {
     min-height: auto;
     padding: 5rem 1rem 3rem;
@@ -1579,11 +1643,58 @@ td {
   }
 
   .portal-panels {
-    padding: 0.85rem;
+    min-height: 0;
+    padding: 0.85rem 0.25rem;
   }
 
   .panel-header {
     display: grid;
+    gap: 0.55rem;
+  }
+
+  .status-pill {
+    justify-self: start;
+    white-space: normal;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 1rem;
+    padding: 0.78rem 0.8rem;
+  }
+
+  .file-drop {
+    padding: 0.95rem;
+  }
+
+  .table-wrap {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  table {
+    min-width: 640px;
+  }
+
+  th,
+  td {
+    padding: 0.65rem 0.7rem;
+  }
+
+  .toast {
+    right: 0.75rem;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    max-width: none;
+  }
+
+  .footer-brand-strip {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 
   .site-footer {
@@ -1592,6 +1703,39 @@ td {
 }
 
 @media (max-width: 430px) {
+  :root {
+    --header-h: 64px;
+  }
+
+  .header-inner {
+    gap: 0.55rem;
+    padding: 0 0.75rem;
+  }
+
+  .brand {
+    gap: 0.42rem;
+    max-width: calc(100vw - 72px);
+  }
+
+  .brand-logo-aims {
+    width: 112px;
+    max-height: 34px;
+  }
+
+  .brand-logo-afriqa {
+    width: 70px;
+    max-height: 34px;
+  }
+
+  .brand-divider {
+    height: 30px;
+  }
+
+  .nav-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
   h1 {
     font-size: 2.45rem;
   }
@@ -1603,14 +1747,92 @@ td {
   .hero-actions,
   .form-actions {
     display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
   }
 
   .button {
     width: 100%;
+    min-height: 46px;
+    padding-right: 0.8rem;
+    padding-left: 0.8rem;
+    white-space: normal;
+  }
+
+  .portal-grid {
+    padding: 0 0.6rem;
+  }
+
+  .portal-sidebar {
+    margin-right: -0.6rem;
+    margin-left: -0.6rem;
+    padding-right: 0.6rem;
+    padding-left: 0.6rem;
+  }
+
+  .portal-panels {
+    padding: 0.65rem 0;
+  }
+
+  .portal-success {
+    padding: 0.85rem;
+  }
+
+  .progress-grid article {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .progress-grid strong {
+    font-size: 1.65rem;
+  }
+
+  .admin-tools {
+    gap: 0.75rem;
+  }
+
+  .table-wrap {
+    margin-right: -0.6rem;
+    margin-left: -0.6rem;
   }
 
   .countdown {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 360px) {
+  .brand-logo-aims {
+    width: 100px;
+  }
+
+  .brand-logo-afriqa {
+    width: 62px;
+  }
+
+  .brand-divider {
+    height: 28px;
+  }
+
+  h1 {
+    font-size: 2.12rem;
+  }
+
+  h2 {
+    font-size: 1.55rem;
+  }
+
+  .section {
+    padding-top: 3.3rem;
+    padding-bottom: 3.3rem;
+  }
+
+  .portal-tab {
+    font-size: 0.88rem;
+    padding-right: 0.65rem;
+    padding-left: 0.65rem;
   }
 }
 
