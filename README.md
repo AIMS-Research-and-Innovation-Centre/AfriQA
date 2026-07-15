@@ -4,7 +4,7 @@ This is a static, fast-loading HTML/CSS/JavaScript conference site for:
 
 **Quantum Science & Technology Across Africa**  
 30 November - 4 December 2026  
-AIMS Research Innovation Centre, Kigali, Rwanda
+AIMS Research and Innovation Centre, Kigali, Rwanda
 
 ## What is included
 
