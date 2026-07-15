@@ -296,7 +296,7 @@
               <form id="account-form" class="form-grid" autocomplete="off">
                 <label>
                   Full name
-                  <input name="name" autocomplete="name" required placeholder="Your full name" />
+                  <input name="name" autocomplete="off" required placeholder="Your full name" data-lpignore="true" data-1p-ignore />
                 </label>
                 <label>
                   Email address
@@ -330,6 +330,17 @@
                   <button class="button primary" type="submit" data-account-submit data-requires-endpoint>Create account</button>
                 </div>
               </form>
+              <div class="portal-success" data-account-success role="status" aria-live="polite" hidden>
+                <h4>Account creation successful.</h4>
+                <p>
+                  Please check <strong data-account-success-email>your email</strong> for confirmation,
+                  then proceed with your application or registration.
+                </p>
+                <div class="form-actions">
+                  <button class="button primary" type="button" data-go-tab="registration">Proceed to application/registration</button>
+                  <a class="button secondary" href="#portal" data-portal-link>Open portal link</a>
+                </div>
+              </div>
             </section>
 
             <section class="portal-panel" data-panel="dashboard" aria-labelledby="dashboard-title">
@@ -356,7 +367,7 @@
                   <h3 id="registration-title">Participation details</h3>
                 </div>
               </div>
-              <form id="registration-form" class="form-grid">
+              <form id="registration-form" class="form-grid" autocomplete="off">
                 <label>
                   Attendance type
                   <select name="attendanceType" required>
@@ -389,11 +400,11 @@
                 </label>
                 <label>
                   Dietary requirements
-                  <input name="dietary" placeholder="Optional" />
+                  <input name="dietary" autocomplete="off" placeholder="Optional" data-lpignore="true" data-1p-ignore />
                 </label>
                 <label>
                   Accessibility requirements
-                  <input name="accessibility" placeholder="Optional" />
+                  <input name="accessibility" autocomplete="off" placeholder="Optional" data-lpignore="true" data-1p-ignore />
                 </label>
                 <label class="full">
                   What do you hope to contribute?
@@ -413,7 +424,7 @@
                   <h3 id="abstract-title">Poster or talk proposal</h3>
                 </div>
               </div>
-              <form id="abstract-form" class="form-grid">
+              <form id="abstract-form" class="form-grid" autocomplete="off">
                 <label class="full">
                   Title
                   <input name="title" required placeholder="Concise scientific title" />
@@ -454,7 +465,7 @@
                   <h3 id="support-title">Travel grant application</h3>
                 </div>
               </div>
-              <form id="support-form" class="form-grid">
+              <form id="support-form" class="form-grid" autocomplete="off">
                 <label>
                   Sponsorship category
                   <select name="supportType" required>
@@ -490,7 +501,7 @@
                   <h3 id="uploads-title">CV, passport, abstract, and supporting documents</h3>
                 </div>
               </div>
-              <form id="upload-form" class="upload-zone">
+              <form id="upload-form" class="upload-zone" autocomplete="off">
                 <label>
                   Document type
                   <select name="documentType" required>

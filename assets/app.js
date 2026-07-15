@@ -3,6 +3,7 @@
 
   var APP_CONFIG = {
     appsScriptUrl: "https://script.google.com/macros/s/AKfycbws-NWcwenRceDayw5JcHZLcO2kh-nq-E53U-Ivnb0eyfUYtvMfTRtF_fec6yvhT8Kf/exec",
+    siteUrl: "https://aims-research-and-innovation-centre.github.io/AfriQA/",
     storageKey: "afriqa-2026-portal-state"
   };
   var ENDPOINT_PENDING_MESSAGE =
@@ -21,26 +22,28 @@
 
   function loadState() {
     try {
-      return JSON.parse(localStorage.getItem(APP_CONFIG.storageKey)) || {
-        account: null,
-        registration: {},
-        abstract: {},
-        support: {},
-        uploads: [],
-        status: "Draft",
-        events: []
-      };
+      return normaliseState(JSON.parse(localStorage.getItem(APP_CONFIG.storageKey)) || {});
     } catch (error) {
-      return {
-        account: null,
-        registration: {},
-        abstract: {},
-        support: {},
-        uploads: [],
-        status: "Draft",
-        events: []
-      };
+      return normaliseState({});
     }
+  }
+
+  function normaliseState(saved) {
+    var clean = {
+      account: saved.account ? accountSummary(saved.account) : null,
+      registration: saved.registration || {},
+      abstract: saved.abstract || {},
+      support: saved.support || {},
+      uploads: Array.isArray(saved.uploads) ? saved.uploads : [],
+      status: saved.status || "Draft",
+      events: Array.isArray(saved.events) ? saved.events : []
+    };
+    try {
+      localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(clean));
+    } catch (error) {
+      // Local storage is only used for dashboard convenience; the production database remains Google Sheets.
+    }
+    return clean;
   }
 
   function saveState() {
@@ -357,17 +360,27 @@
 
   function setupPortalTabs() {
     var tabs = qsa(".portal-tab");
-    var panels = qsa(".portal-panel");
     tabs.forEach(function (tab) {
       tab.addEventListener("click", function () {
-        tabs.forEach(function (item) {
-          item.classList.toggle("active", item === tab);
-        });
-        panels.forEach(function (panel) {
-          panel.classList.toggle("active", panel.dataset.panel === tab.dataset.tab);
-        });
+        activatePortalTab(tab.dataset.tab);
       });
     });
+    qsa("[data-go-tab]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        activatePortalTab(button.dataset.goTab);
+      });
+    });
+  }
+
+  function activatePortalTab(tabName) {
+    qsa(".portal-tab").forEach(function (item) {
+      item.classList.toggle("active", item.dataset.tab === tabName);
+    });
+    qsa(".portal-panel").forEach(function (panel) {
+      panel.classList.toggle("active", panel.dataset.panel === tabName);
+    });
+    var activePanel = qs('[data-panel="' + tabName + '"]');
+    if (activePanel) activePanel.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function setupForms() {
@@ -377,11 +390,6 @@
     var supportForm = qs("#support-form");
     var uploadForm = qs("#upload-form");
 
-    restoreForm(registrationForm, state.registration);
-    restoreForm(abstractForm, state.abstract);
-    restoreForm(supportForm, state.support);
-    if (state.account) restoreForm(accountForm, state.account);
-
     accountForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       if (!isEndpointConfigured()) {
@@ -389,16 +397,19 @@
         return;
       }
       var values = serialiseForm(accountForm);
+      values.portalUrl = getPortalUrl();
       try {
         var result = await apiRequest("registerUser", values);
-        state.account = values;
+        state.account = accountSummary(values);
         state.sessionToken = result.sessionToken || state.sessionToken;
         state.role = result.role || state.role || "applicant";
         state.status = state.status === "Draft" ? "Profile created" : state.status;
-        addStatusEvent("Account saved", "Your applicant profile is available in the dashboard.");
+        addStatusEvent("Account created", "Check your email, then continue with registration or application.");
         saveState();
+        showAccountSuccess(values.email);
+        accountForm.reset();
         if (state.role === "admin" && window.refreshAdminRows) window.refreshAdminRows();
-        notify("Account saved and confirmation email queued.");
+        notify("Account creation successful. Please check your email, then proceed with application/registration.");
       } catch (error) {
         notify(error.message);
       }
@@ -479,19 +490,35 @@
         state.status = "Submitted";
         addStatusEvent(successTitle, "The portal has recorded this submission.");
         saveState();
-        notify(successTitle + ".");
+        notify(successTitle + ". Please check your email for confirmation.");
       } catch (error) {
         notify(error.message);
       }
     };
   }
 
-  function restoreForm(form, values) {
-    if (!form || !values) return;
-    Object.keys(values).forEach(function (key) {
-      var field = form.elements[key];
-      if (field && field.type !== "file") field.value = values[key];
-    });
+  function showAccountSuccess(email) {
+    var box = qs("[data-account-success]");
+    if (!box) return;
+    var emailNode = qs("[data-account-success-email]", box);
+    var link = qs("[data-portal-link]", box);
+    if (emailNode) emailNode.textContent = email || "your email";
+    if (link) link.href = getPortalUrl();
+    box.hidden = false;
+  }
+
+  function getPortalUrl() {
+    return APP_CONFIG.siteUrl.replace(/\/?$/, "/") + "#portal";
+  }
+
+  function accountSummary(values) {
+    return {
+      name: values.name || "",
+      email: values.email || "",
+      institution: values.institution || "",
+      country: values.country || "",
+      careerStage: values.careerStage || ""
+    };
   }
 
   function renderDashboard() {

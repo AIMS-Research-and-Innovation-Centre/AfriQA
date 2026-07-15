@@ -9,17 +9,28 @@
  * - SPREADSHEET_ID: Google Sheet database id
  * - UPLOAD_FOLDER_ID: Google Drive folder id for applicant files
  * - ADMIN_EMAILS: comma-separated admin emails
+ * - PORTAL_URL: public GitHub Pages portal URL
+ * - MAIL_FROM_ALIAS: optional verified Gmail alias, for example afriqa@aimsric.org
+ * - MAIL_REPLY_TO: reply-to address, for example academicoffice@aimsric.org
  */
 
 var INSTALL_DEFAULTS = {
   spreadsheetId: "11L63X0S7ulgu8-fAKztx4h8Awn69seew3oD32rVIm6k",
-  uploadFolderId: "1_wQXNC22JrldZRbxg7t2j5LdWcE4jxc5"
+  uploadFolderId: "1_wQXNC22JrldZRbxg7t2j5LdWcE4jxc5",
+  portalUrl: "https://aims-research-and-innovation-centre.github.io/AfriQA/#portal",
+  mailFromAlias: "afriqa@aimsric.org",
+  mailReplyTo: "academicoffice@aimsric.org",
+  mailSenderName: "AfriQA 2026 Academic Office"
 };
 
 var CONFIG = {
   appName: "AfriQA 2026 Portal",
   spreadsheetId: PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID"),
   uploadFolderId: PropertiesService.getScriptProperties().getProperty("UPLOAD_FOLDER_ID"),
+  portalUrl: PropertiesService.getScriptProperties().getProperty("PORTAL_URL") || INSTALL_DEFAULTS.portalUrl,
+  mailFromAlias: normaliseOptionalEmail(PropertiesService.getScriptProperties().getProperty("MAIL_FROM_ALIAS") || INSTALL_DEFAULTS.mailFromAlias),
+  mailReplyTo: normaliseOptionalEmail(PropertiesService.getScriptProperties().getProperty("MAIL_REPLY_TO") || INSTALL_DEFAULTS.mailReplyTo),
+  mailSenderName: PropertiesService.getScriptProperties().getProperty("MAIL_SENDER_NAME") || INSTALL_DEFAULTS.mailSenderName,
   adminEmails: String(PropertiesService.getScriptProperties().getProperty("ADMIN_EMAILS") || "")
     .split(",")
     .map(function (email) {
@@ -93,12 +104,20 @@ function installAfriqaPortal() {
     {
       SPREADSHEET_ID: INSTALL_DEFAULTS.spreadsheetId,
       UPLOAD_FOLDER_ID: INSTALL_DEFAULTS.uploadFolderId,
-      ADMIN_EMAILS: props.getProperty("ADMIN_EMAILS") || ""
+      ADMIN_EMAILS: props.getProperty("ADMIN_EMAILS") || "",
+      PORTAL_URL: props.getProperty("PORTAL_URL") || INSTALL_DEFAULTS.portalUrl,
+      MAIL_FROM_ALIAS: props.getProperty("MAIL_FROM_ALIAS") || INSTALL_DEFAULTS.mailFromAlias,
+      MAIL_REPLY_TO: props.getProperty("MAIL_REPLY_TO") || INSTALL_DEFAULTS.mailReplyTo,
+      MAIL_SENDER_NAME: props.getProperty("MAIL_SENDER_NAME") || INSTALL_DEFAULTS.mailSenderName
     },
     false
   );
   CONFIG.spreadsheetId = INSTALL_DEFAULTS.spreadsheetId;
   CONFIG.uploadFolderId = INSTALL_DEFAULTS.uploadFolderId;
+  CONFIG.portalUrl = props.getProperty("PORTAL_URL") || INSTALL_DEFAULTS.portalUrl;
+  CONFIG.mailFromAlias = normaliseOptionalEmail(props.getProperty("MAIL_FROM_ALIAS") || INSTALL_DEFAULTS.mailFromAlias);
+  CONFIG.mailReplyTo = normaliseOptionalEmail(props.getProperty("MAIL_REPLY_TO") || INSTALL_DEFAULTS.mailReplyTo);
+  CONFIG.mailSenderName = props.getProperty("MAIL_SENDER_NAME") || INSTALL_DEFAULTS.mailSenderName;
   CONFIG.adminEmails = String(props.getProperty("ADMIN_EMAILS") || "")
     .split(",")
     .map(function (email) {
@@ -110,6 +129,9 @@ function installAfriqaPortal() {
   Logger.log("SPREADSHEET_ID: " + INSTALL_DEFAULTS.spreadsheetId);
   Logger.log("UPLOAD_FOLDER_ID: " + INSTALL_DEFAULTS.uploadFolderId);
   Logger.log("ADMIN_EMAILS: " + (props.getProperty("ADMIN_EMAILS") || "Set this manually in Project Settings."));
+  Logger.log("PORTAL_URL: " + CONFIG.portalUrl);
+  Logger.log("MAIL_FROM_ALIAS: " + (CONFIG.mailFromAlias || "Not set"));
+  Logger.log("MAIL_REPLY_TO: " + (CONFIG.mailReplyTo || "Not set"));
 }
 
 function doGet() {
@@ -225,8 +247,21 @@ function registerUser(payload) {
   upsertBy(users, SHEETS.users.headers, "email", email, row);
   audit(email, "registerUser", userId, { role: role });
   var session = createSession(userId, email);
-  sendConfirmation(email, "AfriQA 2026 portal account", "Your AfriQA 2026 portal account has been created or updated.");
-  return { userId: userId, email: email, role: role, sessionToken: session.token };
+  var portalUrl = clean(payload.portalUrl || CONFIG.portalUrl, 500);
+  sendConfirmation(
+    email,
+    "AfriQA 2026 portal account created",
+    [
+      "Account creation successful.",
+      "",
+      "Please proceed with your application/registration using this link:",
+      portalUrl,
+      "",
+      "Use the same email address when submitting registration, abstract, travel support, and uploads."
+    ].join("\n"),
+    portalUrl
+  );
+  return { userId: userId, email: email, role: role, sessionToken: session.token, portalUrl: portalUrl };
 }
 
 function loginUser(payload) {
@@ -257,7 +292,17 @@ function submitSection(token, section, payload) {
   validateSection(section, payload);
   var result = writeApplication(user, section, "Submitted", payload);
   audit(user.email, "submitSection", result.applicationId, { section: section });
-  sendConfirmation(user.email, "AfriQA 2026 " + section + " submitted", "Your " + section + " submission has been received.");
+  sendConfirmation(
+    user.email,
+    "AfriQA 2026 " + section + " submitted",
+    [
+      "Your " + section + " submission has been received.",
+      "",
+      "You can return to the portal here:",
+      CONFIG.portalUrl
+    ].join("\n"),
+    CONFIG.portalUrl
+  );
   return result;
 }
 
@@ -381,7 +426,17 @@ function updateStatus(token, payload) {
     }
   });
   audit(admin.email, "updateStatus", email, { status: status });
-  sendConfirmation(email, "AfriQA 2026 application status update", "Your application status has been updated to: " + status + ".");
+  sendConfirmation(
+    email,
+    "AfriQA 2026 application status update",
+    [
+      "Your application status has been updated to: " + status + ".",
+      "",
+      "You can return to the portal here:",
+      CONFIG.portalUrl
+    ].join("\n"),
+    CONFIG.portalUrl
+  );
   return { email: email, status: status };
 }
 
@@ -523,6 +578,11 @@ function normaliseEmail(email) {
   return value;
 }
 
+function normaliseOptionalEmail(email) {
+  var value = String(email || "").trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? value : "";
+}
+
 function hashPassword(password, salt) {
   var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + "::" + password);
   return Utilities.base64Encode(bytes);
@@ -547,16 +607,77 @@ function cleanFileName(name) {
   return clean(name, 220).replace(/[^a-z0-9._-]/gi, "_");
 }
 
-function sendConfirmation(email, subject, body) {
+function escapeHtml(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function sendConfirmation(email, subject, body, portalUrl) {
   try {
-    MailApp.sendEmail({
+    var link = portalUrl || CONFIG.portalUrl;
+    var textBody =
+      body +
+      "\n\n" +
+      CONFIG.appName +
+      "\nAIMS Research and Innovation Centre";
+    var htmlBody = buildEmailHtml(body, link);
+    var options = {
       to: email,
       subject: subject,
-      body: body + "\n\n" + CONFIG.appName
-    });
+      body: textBody,
+      name: CONFIG.mailSenderName,
+      htmlBody: htmlBody
+    };
+    if (CONFIG.mailReplyTo) options.replyTo = CONFIG.mailReplyTo;
+
+    var alias = getVerifiedSenderAlias();
+    if (alias) {
+      GmailApp.sendEmail(email, subject, textBody, {
+        from: alias,
+        name: CONFIG.mailSenderName,
+        replyTo: CONFIG.mailReplyTo || alias,
+        htmlBody: htmlBody
+      });
+      return;
+    }
+
+    MailApp.sendEmail(options);
   } catch (error) {
     audit("system", "emailFailed", email, { subject: subject, error: String(error) });
   }
+}
+
+function getVerifiedSenderAlias() {
+  if (!CONFIG.mailFromAlias) return "";
+  try {
+    var aliases = GmailApp.getAliases().map(function (email) {
+      return String(email || "").toLowerCase();
+    });
+    return aliases.indexOf(CONFIG.mailFromAlias) >= 0 ? CONFIG.mailFromAlias : "";
+  } catch (error) {
+    audit("system", "emailAliasUnavailable", CONFIG.mailFromAlias, { error: String(error) });
+    return "";
+  }
+}
+
+function buildEmailHtml(body, portalUrl) {
+  var safeBody = escapeHtml(body).replace(/\n/g, "<br>");
+  var safeUrl = escapeHtml(portalUrl || CONFIG.portalUrl);
+  return [
+    '<div style="font-family:Arial,sans-serif;color:#161719;line-height:1.55">',
+    '<p style="margin:0 0 16px">' + safeBody + "</p>",
+    '<p style="margin:20px 0">',
+    '<a href="' + safeUrl + '" style="background:#a93127;color:#fff;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700">Open AfriQA portal</a>',
+    "</p>",
+    '<p style="margin:18px 0 0;color:#5f646b;font-size:13px">',
+    "AfriQA 2026 Portal<br>AIMS Research and Innovation Centre",
+    "</p>",
+    "</div>"
+  ].join("");
 }
 
 function audit(actorEmail, action, target, details) {

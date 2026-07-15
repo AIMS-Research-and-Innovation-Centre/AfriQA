@@ -40,8 +40,25 @@ The required properties are:
 | `SPREADSHEET_ID` | `11L63X0S7ulgu8-fAKztx4h8Awn69seew3oD32rVIm6k` |
 | `UPLOAD_FOLDER_ID` | `1_wQXNC22JrldZRbxg7t2j5LdWcE4jxc5` |
 | `ADMIN_EMAILS` | Your Google account email, or comma-separated admin emails |
+| `PORTAL_URL` | `https://aims-research-and-innovation-centre.github.io/AfriQA/#portal` |
+| `MAIL_FROM_ALIAS` | `afriqa@aimsric.org` if this is a verified Gmail alias for the deploying account |
+| `MAIL_REPLY_TO` | `academicoffice@aimsric.org` |
+| `MAIL_SENDER_NAME` | `AfriQA 2026 Academic Office` |
 
-## 4. Initialize the database
+## 4. Email sender setup
+
+Google does not allow an Apps Script Web App to spoof any sender address. The
+true sender can be `afriqa@aimsric.org` only if one of these is true:
+
+1. The Apps Script project is owned and deployed by `afriqa@aimsric.org`.
+2. `afriqa@aimsric.org` is configured in Gmail as a verified "Send mail as"
+   alias for the account that deploys the script.
+
+The code checks `GmailApp.getAliases()` and uses `MAIL_FROM_ALIAS` only when
+Google reports it as an available alias. Otherwise, mail is still sent with the
+sender name `AfriQA 2026 Academic Office` and replies go to `MAIL_REPLY_TO`.
+
+## 5. Initialize the database
 
 `installAfriqaPortal()` calls `setupDatabase()` for you. You can also run
 `setupDatabase()` later if you ever need to repair the sheet headers. The script
@@ -55,7 +72,7 @@ creates these tabs:
 | `Files` | Uploaded document metadata and Google Drive URLs |
 | `AuditLog` | Admin actions and backend events |
 
-## 5. Deploy the Web App
+## 6. Deploy the Web App
 
 1. Select Deploy > New deployment.
 2. Choose Web app.
@@ -63,13 +80,14 @@ creates these tabs:
 4. Who has access: choose the audience appropriate for the conference. For a public conference portal, use `Anyone`; for an internal test, use your organisation only.
 5. Deploy and copy the Web App URL.
 
-## 6. Connect the website
+## 7. Connect the website
 
 Open `assets/app.js` and paste the Web App URL into:
 
 ```js
 var APP_CONFIG = {
   appsScriptUrl: "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec",
+  siteUrl: "https://aims-research-and-innovation-centre.github.io/AfriQA/",
   storageKey: "afriqa-2026-portal-state"
 };
 ```

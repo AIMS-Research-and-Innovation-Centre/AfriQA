@@ -1118,6 +1118,27 @@ h3 {
   font-weight: 700;
 }
 
+.portal-success {
+  margin-top: 1rem;
+  border: 1px solid rgba(30, 111, 120, 0.24);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(30, 111, 120, 0.12), rgba(159, 47, 36, 0.06)),
+    var(--paper-strong);
+  padding: 1rem;
+}
+
+.portal-success h4 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.portal-success p {
+  margin: 0 0 0.8rem;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
 .progress-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
