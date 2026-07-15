@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AfriQA 2026 | Quantum Science & Technology Across Africa</title>
+    <meta
+      name="description"
+      content="A modern conference website and integrated application portal for AfriQA 2026, Quantum Science and Technology Across Africa, hosted at AIMS Rwanda Innovation Centre in Kigali."
+    />
+    <meta name="theme-color" content="#9f2f24" />
+    <meta property="og:title" content="AfriQA 2026 | Quantum Science & Technology Across Africa" />
+    <meta
+      property="og:description"
+      content="Register, submit abstracts, and apply for travel support for the 2026 African conference on quantum science, quantum technologies, and quantum computing."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="assets/afriqa-logo.png" />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header" data-elevated="false">
+      <div class="header-inner">
+        <a class="brand" href="#home" aria-label="AfriQA and AIMS RIC home">
+          <img class="brand-logo brand-logo-aims" src="assets/aims-ric-logo.png" alt="AIMS Research and Innovation logo" />
+          <span class="brand-divider" aria-hidden="true"></span>
+          <img class="brand-logo brand-logo-afriqa" src="assets/afriqa-logo.png" alt="AfriQA logo" />
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span class="sr-only">Open navigation</span>
+        </button>
+        <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+          <a href="#about">About</a>
+          <a href="#themes">Themes</a>
+          <a href="#programme">Programme</a>
+          <a href="#speakers">Speakers</a>
+          <a href="#travel">Travel</a>
+          <a href="#portal">Portal</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section id="home" class="hero section">
+        <canvas id="quantum-canvas" aria-hidden="true"></canvas>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">African Quantum Alliance Conference 2026</p>
+            <h1>Quantum Science & Technology Across Africa</h1>
+            <p class="lead">
+              A premium scientific gathering for researchers, postgraduate students, innovators,
+              educators, policy actors, and industry partners shaping Africa's quantum future.
+            </p>
+            <div class="hero-actions" aria-label="Primary actions">
+              <a class="button primary" href="#portal">Apply or Register</a>
+              <a class="button secondary" href="#programme">View Programme</a>
+            </div>
+            <dl class="event-facts">
+              <div>
+                <dt>Dates</dt>
+                <dd>30 Nov - 4 Dec 2026</dd>
+              </div>
+              <div>
+                <dt>Venue</dt>
+                <dd>AIMS RIC, Kigali</dd>
+              </div>
+              <div>
+                <dt>Format</dt>
+                <dd>Conference + Summer School</dd>
+              </div>
+            </dl>
+          </div>
+
+          <aside class="hero-panel" aria-label="Conference countdown and highlights">
+            <div class="bloch-visual" aria-hidden="true">
+              <div class="sphere"></div>
+              <div class="axis axis-z"></div>
+              <div class="axis axis-x"></div>
+              <div class="state-vector"></div>
+              <div class="orbit orbit-a"></div>
+              <div class="orbit orbit-b"></div>
+            </div>
+            <p class="panel-kicker">Opening tutorial begins in</p>
+            <div class="countdown" data-countdown="2026-11-30T08:00:00+02:00">
+              <span><strong data-days>000</strong><small>days</small></span>
+              <span><strong data-hours>00</strong><small>hours</small></span>
+              <span><strong data-minutes>00</strong><small>minutes</small></span>
+            </div>
+            <div class="circuit-strip" aria-label="Quantum circuit motif">
+              <span>H</span><i></i><span>CX</span><i></i><span>Rz</span><i></i><span>|psi></span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="stats-band" aria-label="Conference statistics">
+        <div class="stat">
+          <strong>5</strong>
+          <span>programme days</span>
+        </div>
+        <div class="stat">
+          <strong>6</strong>
+          <span>African research-node highlights</span>
+        </div>
+        <div class="stat">
+          <strong>4</strong>
+          <span>core scientific themes</span>
+        </div>
+        <div class="stat">
+          <strong>1</strong>
+          <span>continental quantum network</span>
+        </div>
+      </section>
+
+      <section id="about" class="section two-column">
+        <div>
+          <p class="eyebrow">About the conference</p>
+          <h2>A rigorous conference experience built around Africa's quantum capability.</h2>
+        </div>
+        <div class="section-copy">
+          <p>
+            AfriQA 2026 convenes leading researchers, academics, emerging scientists, and
+            partners across the African continent to strengthen collaboration and advance
+            quantum research. The conference is hosted at the AIMS Rwanda Innovation Centre
+            in Kigali and includes a summer school, tutorials, research highlights, poster
+            sessions, project breakouts, and stakeholder engagement.
+          </p>
+          <p>
+            The visual language of this website is anchored in scientific concepts: probability
+            amplitudes, superposed states, entanglement graphs, wave interference, lattice
+            order, and Bloch-sphere geometry. The result is intentionally academic, precise,
+            and usable.
+          </p>
+        </div>
+      </section>
+
+      <section id="themes" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Scientific themes</p>
+          <h2>From fundamental quantum theory to deployable technologies.</h2>
+        </div>
+        <div class="theme-grid">
+          <article class="theme-card">
+            <span class="theme-index">01</span>
+            <h3>Quantum Sensing & Communication</h3>
+            <p>Metrology, secure communication, field-deployable sensing, and continental quantum links.</p>
+          </article>
+          <article class="theme-card">
+            <span class="theme-index">02</span>
+            <h3>Quantum Algorithms & Machine Learning</h3>
+            <p>Algorithm design, quantum machine learning, complexity, and near-term computational models.</p>
+          </article>
+          <article class="theme-card">
+            <span class="theme-index">03</span>
+            <h3>Quantum Computing Hardware</h3>
+            <p>Photonic chips, cold atoms, topological architectures, and quantum-control platforms.</p>
+          </article>
+          <article class="theme-card">
+            <span class="theme-index">04</span>
+            <h3>Quantum Science Across Africa</h3>
+            <p>Node highlights from Tunisia, Ghana, South Africa, Morocco, Cameroon, and Egypt.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="theme-map" class="section theme-map-section" aria-labelledby="theme-map-title">
+        <div class="section-heading">
+          <p class="eyebrow">Programme theme map</p>
+          <h2 id="theme-map-title">The schedule drawn as an entangled research landscape.</h2>
+          <p>
+            Each programme day is anchored by a dominant scientific mode, with shared links
+            between tutorials, research-node highlights, methods, hardware, education, and
+            stakeholder translation.
+          </p>
+        </div>
+        <div class="theme-map" aria-label="Visual map of conference themes across the five-day schedule">
+          <div class="theme-node node-core">
+            <strong>AfriQA 2026</strong>
+            <span>continental quantum collaboration</span>
+          </div>
+          <div class="theme-node node-a">
+            <strong>Summer School</strong>
+            <span>computing, sensing, communication</span>
+          </div>
+          <div class="theme-node node-b">
+            <strong>Research Nodes</strong>
+            <span>Tunisia, Ghana, South Africa, Morocco, Cameroon, Egypt</span>
+          </div>
+          <div class="theme-node node-c">
+            <strong>Methods & Hardware</strong>
+            <span>communication, sensing, topological QC, cold atoms, photonics</span>
+          </div>
+          <div class="theme-node node-d">
+            <strong>Algorithms & Education</strong>
+            <span>QML, quantum education, young talent talks</span>
+          </div>
+          <div class="theme-node node-e">
+            <strong>Stakeholders</strong>
+            <span>government, industry, academia, PQC demonstration</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="programme" class="section programme-section">
+        <div class="section-heading">
+          <p class="eyebrow">Programme</p>
+          <h2>Five days moving from tutorials to research collaboration.</h2>
+        </div>
+        <div class="day-tabs" role="tablist" aria-label="Programme days"></div>
+        <div class="programme-layout">
+          <div class="timeline-shell">
+            <ol class="programme-list" aria-live="polite"></ol>
+          </div>
+          <aside class="deadline-panel">
+            <h3>Important deadlines</h3>
+            <ul>
+              <li><strong>Abstract submission:</strong> 30 September 2026</li>
+              <li><strong>Travel support application:</strong> 15 October 2026</li>
+              <li><strong>Decision notifications:</strong> 31 October 2026</li>
+              <li><strong>Final registration:</strong> 10 November 2026</li>
+            </ul>
+            <a class="button secondary" href="#portal">Start an application</a>
+          </aside>
+        </div>
+      </section>
+
+      <section id="speakers" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Keynote speakers and contributors</p>
+          <h2>Confirmed contributors from the programme, with keynote roster to be announced.</h2>
+        </div>
+        <div class="speaker-grid"></div>
+      </section>
+
+      <section id="committee" class="section split-band">
+        <div class="section-heading">
+          <p class="eyebrow">Organising committee</p>
+          <h2>Scientific coordination, hosting, and review workflows.</h2>
+        </div>
+        <div class="committee-grid">
+          <article>
+            <h3>Conference organiser</h3>
+            <p>Prof Thomas Konrad, University of KwaZulu-Natal and AfriQA.</p>
+          </article>
+          <article>
+            <h3>Host institution</h3>
+            <p>AIMS Rwanda Innovation Centre, Kigali, Rwanda.</p>
+          </article>
+          <article>
+            <h3>Programme and review</h3>
+            <p>AfriQA scientific committee, tutorial leads, abstract reviewers, and travel-support panel.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="portal" class="section portal-section">
+        <div class="section-heading">
+          <p class="eyebrow">Application and registration portal</p>
+          <h2>Register, submit abstracts, upload documents, and track your status.</h2>
+          <p>
+            This is configured as a production portal. Add the deployed Google Apps Script Web App
+            URL in <code>assets/app.js</code> before opening registration, so submissions are saved
+            directly to Google Sheets and uploads go to Google Drive.
+          </p>
+        </div>
+
+        <div class="portal-grid">
+          <aside class="portal-sidebar" aria-label="Portal navigation">
+            <button class="portal-tab active" type="button" data-tab="account">Account</button>
+            <button class="portal-tab" type="button" data-tab="dashboard">Dashboard</button>
+            <button class="portal-tab" type="button" data-tab="registration">Registration</button>
+            <button class="portal-tab" type="button" data-tab="abstract">Abstract</button>
+            <button class="portal-tab" type="button" data-tab="scholarship">Travel Support</button>
+            <button class="portal-tab" type="button" data-tab="uploads">Uploads</button>
+            <button class="portal-tab" type="button" data-tab="admin">Admin Review</button>
+          </aside>
+
+          <div class="portal-panels">
+            <section class="portal-panel active" data-panel="account" aria-labelledby="account-title">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Secure account</p>
+                  <h3 id="account-title">User registration and authentication</h3>
+                </div>
+                <span class="status-pill" data-auth-state>Production endpoint required</span>
+              </div>
+              <form id="account-form" class="form-grid">
+                <label>
+                  Full name
+                  <input name="name" autocomplete="name" required placeholder="Your full name" />
+                </label>
+                <label>
+                  Email address
+                  <input name="email" type="email" autocomplete="email" required placeholder="name@example.org" />
+                </label>
+                <label>
+                  Password
+                  <input name="password" type="password" autocomplete="new-password" minlength="8" required placeholder="Minimum 8 characters" />
+                </label>
+                <label>
+                  Institution
+                  <input name="institution" required placeholder="University, institute, company, or agency" />
+                </label>
+                <label>
+                  Career stage
+                  <select name="careerStage" required>
+                    <option value="">Select one</option>
+                    <option>Postgraduate student</option>
+                    <option>Postdoctoral researcher</option>
+                    <option>Faculty or researcher</option>
+                    <option>Industry professional</option>
+                    <option>Government or policy</option>
+                  </select>
+                </label>
+                <label>
+                  Country
+                  <input name="country" required placeholder="Country of residence" />
+                </label>
+                <div class="form-actions">
+                  <button class="button primary" type="submit" data-account-submit>Create or update account</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="portal-panel" data-panel="dashboard" aria-labelledby="dashboard-title">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Applicant dashboard</p>
+                  <h3 id="dashboard-title">Your application status</h3>
+                </div>
+                <span class="status-pill" data-dashboard-status>Not started</span>
+              </div>
+              <div class="progress-grid">
+                <article><strong data-progress-account>0%</strong><span>Profile</span></article>
+                <article><strong data-progress-registration>0%</strong><span>Registration</span></article>
+                <article><strong data-progress-abstract>0%</strong><span>Abstract</span></article>
+                <article><strong data-progress-support>0%</strong><span>Support</span></article>
+              </div>
+              <ol class="status-timeline" data-status-timeline></ol>
+            </section>
+
+            <section class="portal-panel" data-panel="registration" aria-labelledby="registration-title">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Conference registration</p>
+                  <h3 id="registration-title">Participation details</h3>
+                </div>
+              </div>
+              <form id="registration-form" class="form-grid">
+                <label>
+                  Attendance type
+                  <select name="attendanceType" required>
+                    <option value="">Select one</option>
+                    <option>Full conference</option>
+                    <option>Summer school only</option>
+                    <option>Stakeholder day only</option>
+                    <option>Online observer if available</option>
+                  </select>
+                </label>
+                <label>
+                  Primary theme
+                  <select name="theme" required>
+                    <option value="">Select one</option>
+                    <option>Quantum Sensing and Communication</option>
+                    <option>Quantum Algorithms and Machine Learning</option>
+                    <option>Quantum Computing Hardware</option>
+                    <option>Quantum Science and Technology across Africa</option>
+                    <option>Quantum Education</option>
+                  </select>
+                </label>
+                <label>
+                  Sponsorship category
+                  <select name="sponsorshipCategory" required>
+                    <option value="">Select one</option>
+                    <option>Fully sponsored</option>
+                    <option>Partially sponsored</option>
+                    <option>Self sponsored</option>
+                  </select>
+                </label>
+                <label>
+                  Dietary requirements
+                  <input name="dietary" placeholder="Optional" />
+                </label>
+                <label>
+                  Accessibility requirements
+                  <input name="accessibility" placeholder="Optional" />
+                </label>
+                <label class="full">
+                  What do you hope to contribute?
+                  <textarea name="contribution" rows="4" placeholder="Briefly describe your research, project, or collaboration interest."></textarea>
+                </label>
+                <div class="form-actions">
+                  <button class="button secondary" type="button" data-save-draft="registration-form">Save draft</button>
+                  <button class="button primary" type="submit">Submit registration</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="portal-panel" data-panel="abstract" aria-labelledby="abstract-title">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Abstract submission</p>
+                  <h3 id="abstract-title">Poster or talk proposal</h3>
+                </div>
+              </div>
+              <form id="abstract-form" class="form-grid">
+                <label class="full">
+                  Title
+                  <input name="title" required placeholder="Concise scientific title" />
+                </label>
+                <label>
+                  Presentation format
+                  <select name="format" required>
+                    <option value="">Select one</option>
+                    <option>Poster</option>
+                    <option>Contributed talk</option>
+                    <option>Young talent talk</option>
+                    <option>White paper project</option>
+                  </select>
+                </label>
+                <label>
+                  Keywords
+                  <input name="keywords" placeholder="quantum sensing, QML, photonics" />
+                </label>
+                <label class="full">
+                  Abstract
+                  <textarea name="abstractText" rows="8" maxlength="2500" required placeholder="Maximum 2500 characters."></textarea>
+                </label>
+                <label class="full">
+                  Co-authors
+                  <textarea name="coauthors" rows="3" placeholder="Name, affiliation, country"></textarea>
+                </label>
+                <div class="form-actions">
+                  <button class="button secondary" type="button" data-save-draft="abstract-form">Save draft</button>
+                  <button class="button primary" type="submit">Submit abstract</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="portal-panel" data-panel="scholarship" aria-labelledby="support-title">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Scholarships and travel support</p>
+                  <h3 id="support-title">Travel grant application</h3>
+                </div>
+              </div>
+              <form id="support-form" class="form-grid">
+                <label>
+                  Sponsorship category
+                  <select name="supportType" required>
+                    <option value="">Select one</option>
+                    <option>Fully sponsored</option>
+                    <option>Partially sponsored</option>
+                    <option>Self sponsored</option>
+                  </select>
+                </label>
+                <label>
+                  Estimated support requested (USD)
+                  <input name="amount" type="number" min="0" step="10" placeholder="0" />
+                </label>
+                <label class="full">
+                  Motivation
+                  <textarea name="motivation" rows="6" required placeholder="Explain need, scientific fit, and expected impact."></textarea>
+                </label>
+                <label class="full">
+                  Current funding sources
+                  <textarea name="funding" rows="3" placeholder="List confirmed or pending funding."></textarea>
+                </label>
+                <div class="form-actions">
+                  <button class="button secondary" type="button" data-save-draft="support-form">Save draft</button>
+                  <button class="button primary" type="submit">Submit support request</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="portal-panel" data-panel="uploads" aria-labelledby="uploads-title">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">File uploads</p>
+                  <h3 id="uploads-title">CV, passport, abstract, and supporting documents</h3>
+                </div>
+              </div>
+              <form id="upload-form" class="upload-zone">
+                <label>
+                  Document type
+                  <select name="documentType" required>
+                    <option value="">Select one</option>
+                    <option>CV</option>
+                    <option>Passport or ID</option>
+                    <option>Abstract PDF</option>
+                    <option>Support letter</option>
+                    <option>Other supporting document</option>
+                  </select>
+                </label>
+                <label class="file-drop">
+                  <input name="file" type="file" required accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <span>Choose a file or drop it here</span>
+                  <small>PDF, DOCX, PNG, or JPG. Recommended maximum: 10 MB.</small>
+                </label>
+                <button class="button primary" type="submit">Upload document</button>
+              </form>
+              <ul class="uploaded-list" data-uploaded-list></ul>
+            </section>
+
+            <section class="portal-panel" data-panel="admin" aria-labelledby="admin-title">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Administrative review portal</p>
+                  <h3 id="admin-title">Search, review, export, and notify</h3>
+                </div>
+                <button class="button secondary" type="button" data-export-csv>Export CSV</button>
+              </div>
+              <div class="admin-tools">
+                <label>
+                  Search applicants
+                  <input data-admin-search placeholder="Search name, country, theme, status" />
+                </label>
+                <label>
+                  Status filter
+                  <select data-admin-filter>
+                    <option value="">All statuses</option>
+                    <option>Draft</option>
+                    <option>Submitted</option>
+                    <option>Under review</option>
+                    <option>Accepted</option>
+                    <option>Waitlisted</option>
+                    <option>Declined</option>
+                  </select>
+                </label>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <caption>Applicant database preview</caption>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Country</th>
+                      <th>Theme</th>
+                      <th>Sponsorship</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody data-admin-table></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="venue" class="section info-grid-section">
+        <div class="section-heading">
+          <p class="eyebrow">Venue and logistics</p>
+          <h2>AIMS Rwanda Innovation Centre, Kigali.</h2>
+        </div>
+        <div class="info-grid">
+          <article id="travel">
+            <h3>Travel Information</h3>
+            <p>
+              The venue is in Kicukiro District, Kicukiro Sector, Gasharu Cell, KN 3 Road,
+              Kigali. International visitors should plan arrival through Kigali International Airport.
+            </p>
+          </article>
+          <article id="accommodation">
+            <h3>Accommodation</h3>
+            <p>
+              Recommended hotels and student accommodation blocks can be added by the organisers.
+              Applicants requesting support should upload a motivation and funding statement.
+            </p>
+          </article>
+          <article id="sponsors">
+            <h3>Sponsors & Partners</h3>
+            <p>
+              AIMS RIC, AfriQA, UKZN, research nodes, government, industry, and academic partners
+              can be listed here as sponsor confirmations are finalised.
+            </p>
+          </article>
+          <article id="news">
+            <h3>News & Announcements</h3>
+            <p>
+              Use this space for keynote announcements, abstract decisions, visa guidance, travel
+              support notifications, and programme updates.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="faq" class="section faq-section">
+        <div class="section-heading">
+          <p class="eyebrow">FAQs</p>
+          <h2>Quick answers for applicants and delegates.</h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>Can I save my application and return later?</summary>
+            <p>Yes. Drafts are saved through Apps Script into the Google Sheet database when the production endpoint is configured.</p>
+          </details>
+          <details>
+            <summary>How are files handled?</summary>
+            <p>The Apps Script backend stores uploaded files in Google Drive and writes document metadata to the Google Sheet database.</p>
+          </details>
+          <details>
+            <summary>Is travel support available?</summary>
+            <p>The application flow supports fully sponsored, partially sponsored, and self sponsored delegates. Organisers can review the stated sponsorship category and requested amount in the admin portal.</p>
+          </details>
+          <details>
+            <summary>Who can access the admin portal?</summary>
+            <p>The Apps Script backend includes admin email validation. Only approved admin accounts should be able to review, export, or update statuses.</p>
+          </details>
+        </div>
+      </section>
+
+      <section id="contact" class="section contact-section">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2>Questions for the organising team?</h2>
+          <p>
+            Add the official conference email once confirmed. The current event organiser listed
+            by AfriQA is Prof Thomas Konrad.
+          </p>
+        </div>
+        <form class="contact-card" aria-label="Contact form preview">
+          <label>
+            Name
+            <input placeholder="Your name" />
+          </label>
+          <label>
+            Email
+            <input type="email" placeholder="name@example.org" />
+          </label>
+          <label>
+            Message
+            <textarea rows="4" placeholder="How can the conference team help?"></textarea>
+          </label>
+          <button class="button primary" type="button">Prepare email</button>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-brand-strip" aria-label="Conference partner logos">
+        <img src="assets/aims-ric-logo.png" alt="AIMS Research and Innovation logo" />
+        <span aria-hidden="true"></span>
+        <img src="assets/afriqa-logo.png" alt="AfriQA logo" />
+      </div>
+      <a href="#home">Back to top</a>
+    </footer>
+
+    <div class="toast" role="status" aria-live="polite" data-toast hidden></div>
+    <script src="assets/data.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>
