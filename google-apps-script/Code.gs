@@ -11,6 +11,11 @@
  * - ADMIN_EMAILS: comma-separated admin emails
  */
 
+var INSTALL_DEFAULTS = {
+  spreadsheetId: "11L63X0S7ulgu8-fAKztx4h8Awn69seew3oD32rVIm6k",
+  uploadFolderId: "1_wQXNC22JrldZRbxg7t2j5LdWcE4jxc5"
+};
+
 var CONFIG = {
   appName: "AfriQA 2026 Portal",
   spreadsheetId: PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID"),
@@ -81,6 +86,32 @@ var SHEETS = {
     headers: ["eventId", "createdAt", "actorEmail", "action", "target", "detailsJson"]
   }
 };
+
+function installAfriqaPortal() {
+  var props = PropertiesService.getScriptProperties();
+  var deployerEmail = Session.getEffectiveUser().getEmail();
+  props.setProperties(
+    {
+      SPREADSHEET_ID: INSTALL_DEFAULTS.spreadsheetId,
+      UPLOAD_FOLDER_ID: INSTALL_DEFAULTS.uploadFolderId,
+      ADMIN_EMAILS: deployerEmail || props.getProperty("ADMIN_EMAILS") || ""
+    },
+    false
+  );
+  CONFIG.spreadsheetId = INSTALL_DEFAULTS.spreadsheetId;
+  CONFIG.uploadFolderId = INSTALL_DEFAULTS.uploadFolderId;
+  CONFIG.adminEmails = String(deployerEmail || props.getProperty("ADMIN_EMAILS") || "")
+    .split(",")
+    .map(function (email) {
+      return email.trim().toLowerCase();
+    })
+    .filter(Boolean);
+  setupDatabase();
+  Logger.log("AfriQA portal database installed.");
+  Logger.log("SPREADSHEET_ID: " + INSTALL_DEFAULTS.spreadsheetId);
+  Logger.log("UPLOAD_FOLDER_ID: " + INSTALL_DEFAULTS.uploadFolderId);
+  Logger.log("ADMIN_EMAILS: " + (deployerEmail || props.getProperty("ADMIN_EMAILS") || "Set this manually in Project Settings."));
+}
 
 function doGet() {
   return jsonResponse({

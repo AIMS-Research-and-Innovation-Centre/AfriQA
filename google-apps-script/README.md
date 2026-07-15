@@ -25,19 +25,29 @@ The Sheet has already been seeded with `Users`, `Sessions`, `Applications`,
 3. Replace the default `Code.gs` with the `Code.gs` in this folder.
 4. Add the `appsscript.json` manifest. In Apps Script, enable "Show appsscript.json manifest file" under Project Settings first.
 
-## 3. Set Script Properties
+## 3. Install with your Google account
 
-In Apps Script, open Project Settings > Script Properties and add:
+Run `installAfriqaPortal()` once from the Apps Script editor. Approve the
+requested permissions when Google asks. This uses your signed-in Google account
+as the deployer, writes the Sheet and Drive IDs into Script Properties, and
+repairs the database tabs.
+
+If Apps Script cannot read your deployer email automatically, open Project
+Settings > Script Properties and set `ADMIN_EMAILS` manually to your own email.
+
+The required properties are:
 
 | Property | Value |
 | --- | --- |
 | `SPREADSHEET_ID` | `11L63X0S7ulgu8-fAKztx4h8Awn69seew3oD32rVIm6k` |
 | `UPLOAD_FOLDER_ID` | `1_wQXNC22JrldZRbxg7t2j5LdWcE4jxc5` |
-| `ADMIN_EMAILS` | Comma-separated admin emails, for example `admin@example.org,chair@example.org` |
+| `ADMIN_EMAILS` | Your Google account email, or comma-separated admin emails |
 
 ## 4. Initialize the database
 
-Run `setupDatabase()` once from the Apps Script editor. The script creates these tabs:
+`installAfriqaPortal()` calls `setupDatabase()` for you. You can also run
+`setupDatabase()` later if you ever need to repair the sheet headers. The script
+creates these tabs:
 
 | Sheet | Purpose |
 | --- | --- |
