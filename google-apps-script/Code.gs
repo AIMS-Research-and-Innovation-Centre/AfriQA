@@ -18,7 +18,8 @@ var INSTALL_DEFAULTS = {
   spreadsheetId: "11L63X0S7ulgu8-fAKztx4h8Awn69seew3oD32rVIm6k",
   uploadFolderId: "1_wQXNC22JrldZRbxg7t2j5LdWcE4jxc5",
   portalUrl: "https://aims-research-and-innovation-centre.github.io/AfriQA/#portal",
-  mailFromAlias: "afriqa@aimsric.org",
+  // mailFromAlias: "afriqa@aimsric.org",
+  mailFromAlias: "academicoffice@aimsric.org",
   mailReplyTo: "academicoffice@aimsric.org",
   mailSenderName: "AfriQA 2026 Academic Office"
 };
