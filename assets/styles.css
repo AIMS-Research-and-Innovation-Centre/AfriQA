@@ -1003,6 +1003,10 @@ h3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.committee-roster {
+  grid-column: span 2;
+}
+
 .committee-grid article {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.16);
@@ -1012,6 +1016,37 @@ h3 {
 
 .committee-grid p {
   color: rgba(255, 255, 255, 0.72);
+}
+
+.organizer-list {
+  display: grid;
+  gap: 0.7rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.organizer-list li {
+  display: grid;
+  gap: 0.18rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 0.7rem;
+}
+
+.organizer-list li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.organizer-list strong {
+  color: white;
+  line-height: 1.25;
+}
+
+.organizer-list span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .portal-section {
@@ -1493,6 +1528,10 @@ td {
   .committee-grid,
   .info-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .committee-roster {
+    grid-column: 1 / -1;
   }
 }
 
