@@ -342,6 +342,23 @@
                   <button class="button primary" type="submit" data-account-submit data-requires-endpoint>Create account</button>
                 </div>
               </form>
+              <div class="auth-panel">
+                <h4>Already created an account?</h4>
+                <p>Sign in before submitting an abstract, registration, travel support request, or document upload.</p>
+                <form id="login-form" class="form-grid" autocomplete="off">
+                  <label>
+                    Email address
+                    <input name="email" type="email" autocomplete="off" inputmode="email" autocapitalize="none" spellcheck="false" required placeholder="name@example.org" data-lpignore="true" data-1p-ignore />
+                  </label>
+                  <label>
+                    Password
+                    <input name="password" type="password" autocomplete="current-password" required placeholder="Your AfriQA portal password" />
+                  </label>
+                  <div class="form-actions">
+                    <button class="button secondary" type="submit" data-requires-endpoint>Sign in to portal</button>
+                  </div>
+                </form>
+              </div>
               <div class="portal-success" data-account-success role="status" aria-live="polite" hidden>
                 <h4>Account creation successful.</h4>
                 <p>
@@ -527,6 +544,13 @@
                   <button class="button primary" type="submit" data-requires-endpoint>Submit abstract</button>
                 </div>
               </form>
+              <div class="portal-success" data-abstract-success role="status" aria-live="polite" hidden>
+                <h4>Abstract submission successful.</h4>
+                <p>
+                  Your abstract has been saved in the AfriQA portal. A confirmation email has been sent to
+                  <strong data-abstract-success-email>your account email</strong>.
+                </p>
+              </div>
             </section>
 
             <section class="portal-panel" data-panel="scholarship" aria-labelledby="support-title">

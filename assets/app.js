@@ -8,6 +8,8 @@
   };
   var ENDPOINT_PENDING_MESSAGE =
     "Registration is not open yet. The secure application system is being connected by the organising team.";
+  var AUTH_REQUIRED_MESSAGE =
+    "Please create or sign in to your AfriQA portal account before submitting. A confirmation email is sent after the portal saves your submission.";
   var ABSTRACT_UPLOAD_DOCUMENT_TYPE = "Abstract document";
   var ABSTRACT_MAX_FILE_SIZE = 10 * 1024 * 1024;
   var ABSTRACT_ALLOWED_EXTENSIONS = /\.(pdf|doc|docx)$/i;
@@ -39,6 +41,8 @@
       support: saved.support || {},
       uploads: Array.isArray(saved.uploads) ? saved.uploads : [],
       status: saved.status || "Draft",
+      sessionToken: saved.sessionToken || "",
+      role: saved.role || "",
       events: Array.isArray(saved.events) ? saved.events : []
     };
     try {
@@ -63,7 +67,7 @@
     window.clearTimeout(notify.timer);
     notify.timer = window.setTimeout(function () {
       toast.hidden = true;
-    }, 4200);
+    }, 6500);
   }
 
   function serialiseForm(form) {
@@ -109,7 +113,13 @@
 
     var result = await response.json();
     if (!result.ok) {
-      throw new Error(result.error || "The request could not be completed.");
+      var message = result.error || "The request could not be completed.";
+      if (/authentication token|session is invalid|session has expired/i.test(message)) {
+        state.sessionToken = "";
+        saveState();
+        throw new Error(AUTH_REQUIRED_MESSAGE);
+      }
+      throw new Error(message);
     }
     return result.result || result;
   }
@@ -391,6 +401,7 @@
 
   function setupForms() {
     var accountForm = qs("#account-form");
+    var loginForm = qs("#login-form");
     var registrationForm = qs("#registration-form");
     var abstractForm = qs("#abstract-form");
     var supportForm = qs("#support-form");
@@ -423,6 +434,29 @@
       }
     });
 
+    loginForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      if (!isEndpointConfigured()) {
+        notify(ENDPOINT_PENDING_MESSAGE);
+        return;
+      }
+      var values = serialiseForm(loginForm);
+      try {
+        var result = await apiRequest("loginUser", values);
+        state.sessionToken = result.sessionToken || "";
+        state.role = result.role || state.role || "applicant";
+        state.account = Object.assign({}, state.account || {}, { email: result.email || values.email });
+        state.status = state.status === "Draft" ? "Signed in" : state.status;
+        addStatusEvent("Signed in", "Portal session restored for " + (result.email || values.email) + ".");
+        saveState();
+        loginForm.reset();
+        if (state.role === "admin" && window.refreshAdminRows) window.refreshAdminRows();
+        notify("Signed in. You can now submit your abstract, registration, support request, or documents.");
+      } catch (error) {
+        notify(error.message);
+      }
+    });
+
     registrationForm.addEventListener("submit", handleNamedSubmit("submitRegistration", registrationForm, "registration", "Registration submitted"));
     abstractForm.addEventListener("submit", handleAbstractSubmit);
     supportForm.addEventListener("submit", handleNamedSubmit("submitScholarship", supportForm, "support", "Travel support request submitted"));
@@ -433,6 +467,7 @@
           notify(ENDPOINT_PENDING_MESSAGE);
           return;
         }
+        if (!requirePortalSession("saving a draft")) return;
         var form = qs("#" + button.dataset.saveDraft);
         var key = form.id.replace("-form", "");
         if (key === "support") key = "support";
@@ -456,6 +491,7 @@
         notify(ENDPOINT_PENDING_MESSAGE);
         return;
       }
+      if (!requirePortalSession("uploading documents")) return;
       var fileInput = qs('input[type="file"]', uploadForm);
       var file = fileInput.files[0];
       if (!file) {
@@ -483,6 +519,21 @@
         notify(error.message);
       }
     });
+  }
+
+  function requirePortalSession(actionLabel) {
+    if (state.sessionToken) return true;
+    notify(
+      "Please create or sign in to your AfriQA portal account before " +
+        actionLabel +
+        ". Your confirmation email is sent after the portal saves the submission."
+    );
+    activatePortalTab("account");
+    window.setTimeout(function () {
+      var email = qs('#login-form input[name="email"]') || qs('#account-form input[name="email"]');
+      if (email) email.focus();
+    }, 350);
+    return false;
   }
 
   function setupAbstractMode(form) {
@@ -550,6 +601,7 @@
       notify(ENDPOINT_PENDING_MESSAGE);
       return;
     }
+    if (!requirePortalSession("submitting your abstract")) return;
 
     var mode = getAbstractMode(form);
     try {
@@ -578,6 +630,7 @@
     addStatusEvent("Abstract submitted", "Structured abstract details recorded.");
     saveState();
     form.reset();
+    showAbstractSuccess(state.account && state.account.email);
     notify("Abstract submitted. Please check your email for confirmation.");
   }
 
@@ -615,6 +668,7 @@
     addStatusEvent("Abstract submitted", "Uploaded abstract document recorded: " + file.name);
     saveState();
     form.reset();
+    showAbstractSuccess(state.account && state.account.email);
     notify("Abstract submitted. Your uploaded document has been recorded; please check your email.");
   }
 
@@ -644,6 +698,7 @@
         notify(ENDPOINT_PENDING_MESSAGE);
         return;
       }
+      if (!requirePortalSession("submitting this form")) return;
       var values = serialiseForm(form);
       try {
         await apiRequest(action, values);
@@ -668,6 +723,15 @@
     box.hidden = false;
   }
 
+  function showAbstractSuccess(email) {
+    var box = qs("[data-abstract-success]");
+    if (!box) return;
+    var emailNode = qs("[data-abstract-success-email]", box);
+    if (emailNode) emailNode.textContent = email || "your account email";
+    box.hidden = false;
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
   function getPortalUrl() {
     return APP_CONFIG.siteUrl.replace(/\/?$/, "/") + "#portal";
   }
@@ -689,8 +753,10 @@
     if (status) status.textContent = state.status || "Draft";
     if (auth) {
       auth.textContent = isEndpointConfigured()
-        ? state.account
+        ? state.sessionToken
           ? "Signed in"
+          : state.account
+            ? "Sign in required"
           : "Registration online"
         : "Registration opening soon";
     }
