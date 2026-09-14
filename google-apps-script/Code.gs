@@ -289,8 +289,9 @@ function saveDraft(token, payload) {
 
 function submitSection(token, section, payload) {
   var user = requireUser(token);
-  validateSection(section, payload);
-  var result = writeApplication(user, section, "Submitted", payload);
+  var sectionPayload = prepareSectionPayload(user, section, payload || {});
+  validateSection(section, sectionPayload);
+  var result = writeApplication(user, section, "Submitted", sectionPayload);
   audit(user.email, "submitSection", result.applicationId, { section: section });
   sendConfirmation(
     user.email,
@@ -304,6 +305,32 @@ function submitSection(token, section, payload) {
     CONFIG.portalUrl
   );
   return result;
+}
+
+function prepareSectionPayload(user, section, payload) {
+  if (section !== "abstract") return payload;
+  if (String(payload.submissionMode || "").toLowerCase() !== "upload" || !payload.file) return payload;
+  payload.format = payload.format || payload.uploadedFormat || "";
+  requireFields(payload, ["format"]);
+
+  var saved = saveUserFile(user, "Abstract document", payload.file);
+  audit(user.email, "uploadFile", saved.fileId, { documentType: saved.documentType, fileName: saved.fileName });
+  var values = {};
+  Object.keys(payload).forEach(function (key) {
+    if (key !== "file") values[key] = payload[key];
+  });
+  values.submissionMode = "upload";
+  values.title = values.title || "Uploaded abstract document: " + saved.fileName;
+  values.keywords = values.keywords || "Included in uploaded abstract document";
+  values.authors = values.authors || "Included in uploaded abstract document";
+  values.abstractText = values.abstractText || "Complete abstract document uploaded to Google Drive: " + saved.driveUrl;
+  values.uploadedAbstractFileName = values.uploadedAbstractFileName || saved.fileName;
+  values.uploadedAbstractMimeType = values.uploadedAbstractMimeType || saved.mimeType;
+  values.uploadedAbstractSize = values.uploadedAbstractSize || String(saved.size);
+  values.uploadedAbstractDriveFileId = values.uploadedAbstractDriveFileId || saved.driveFileId;
+  values.uploadedAbstractDriveUrl = values.uploadedAbstractDriveUrl || saved.driveUrl;
+  values.uploadedAbstractDocumentType = values.uploadedAbstractDocumentType || saved.documentType;
+  return values;
 }
 
 function writeApplication(user, section, status, payload) {
@@ -333,14 +360,29 @@ function writeApplication(user, section, status, payload) {
 function uploadFile(token, payload) {
   var user = requireUser(token);
   requireFields(payload, ["documentType", "file"]);
+  var saved = saveUserFile(user, payload.documentType, payload.file);
+  audit(user.email, "uploadFile", saved.fileId, { documentType: payload.documentType, fileName: saved.fileName });
+  return {
+    fileId: saved.fileId,
+    driveFileId: saved.driveFileId,
+    driveUrl: saved.driveUrl,
+    fileName: saved.fileName,
+    mimeType: saved.mimeType,
+    size: saved.size,
+    documentType: saved.documentType
+  };
+}
+
+function saveUserFile(user, documentType, file) {
   if (!CONFIG.uploadFolderId) throw new Error("UPLOAD_FOLDER_ID script property is not configured.");
-  var file = payload.file;
   requireFields(file, ["name", "mimeType", "data"]);
-  if (Number(file.size || 0) > 10 * 1024 * 1024) throw new Error("File exceeds 10 MB limit.");
+  var cleanDocumentType = clean(documentType, 120);
+  validateUploadFile(cleanDocumentType, file);
 
   var folder = DriveApp.getFolderById(CONFIG.uploadFolderId);
   var safeName = user.email.replace(/[^a-z0-9@._-]/gi, "_") + "_" + Date.now() + "_" + cleanFileName(file.name);
-  var blob = Utilities.newBlob(Utilities.base64Decode(file.data), file.mimeType, safeName);
+  var bytes = Utilities.base64Decode(String(file.data || ""));
+  var blob = Utilities.newBlob(bytes, file.mimeType, safeName);
   var driveFile = folder.createFile(blob);
   var now = nowIso();
   var fileId = "fil_" + Utilities.getUuid();
@@ -348,17 +390,40 @@ function uploadFile(token, payload) {
     fileId,
     user.userId,
     user.email,
-    clean(payload.documentType, 120),
+    cleanDocumentType,
     clean(file.name, 240),
     clean(file.mimeType, 120),
-    Number(file.size || 0),
+    bytes.length,
     driveFile.getId(),
     driveFile.getUrl(),
     now
   ];
   getSheet("files").appendRow(row);
-  audit(user.email, "uploadFile", fileId, { documentType: payload.documentType, fileName: file.name });
-  return { fileId: fileId, driveFileId: driveFile.getId(), driveUrl: driveFile.getUrl() };
+  return {
+    fileId: fileId,
+    driveFileId: driveFile.getId(),
+    driveUrl: driveFile.getUrl(),
+    fileName: clean(file.name, 240),
+    mimeType: clean(file.mimeType, 120),
+    size: bytes.length,
+    documentType: cleanDocumentType
+  };
+}
+
+function validateUploadFile(documentType, file) {
+  var lowerName = String(file.name || "").toLowerCase();
+  var extension = lowerName.indexOf(".") >= 0 ? lowerName.split(".").pop() : "";
+  var allowedExtensions = ["pdf", "doc", "docx", "png", "jpg", "jpeg"];
+  var abstractExtensions = ["pdf", "doc", "docx"];
+  if (allowedExtensions.indexOf(extension) < 0) {
+    throw new Error("Unsupported file type. Upload PDF, DOC, DOCX, PNG, or JPG.");
+  }
+  if (/abstract/i.test(documentType) && abstractExtensions.indexOf(extension) < 0) {
+    throw new Error("Abstract documents must be uploaded as PDF, DOC, or DOCX.");
+  }
+  if (Number(file.size || 0) > 10 * 1024 * 1024) throw new Error("File exceeds 10 MB limit.");
+  var decodedSize = Utilities.base64Decode(String(file.data || "")).length;
+  if (decodedSize > 10 * 1024 * 1024) throw new Error("File exceeds 10 MB limit.");
 }
 
 function adminListApplicants(token, payload) {
@@ -396,6 +461,9 @@ function adminListApplicants(token, payload) {
         institution: record.institution,
         careerStage: record.careerStage,
         theme: registrationPayload.theme || abstractPayload.keywords || "",
+        abstractTitle: abstractPayload.title || "",
+        abstractSubmissionMode: abstractPayload.submissionMode || "paste",
+        abstractFileUrl: abstractPayload.uploadedAbstractDriveUrl || "",
         sponsorshipCategory: registrationPayload.sponsorshipCategory || scholarshipPayload.supportType || "",
         status: latestStatus,
         sections: applicantApps.map(function (app) {
@@ -451,6 +519,9 @@ function exportCsv(token) {
     "institution",
     "careerStage",
     "theme",
+    "abstractTitle",
+    "abstractSubmissionMode",
+    "abstractFileUrl",
     "sponsorshipCategory",
     "status",
     "sections"
@@ -500,7 +571,15 @@ function validateSection(section, payload) {
     requireFields(payload, ["attendanceType", "theme", "sponsorshipCategory"]);
   }
   if (section === "abstract") {
-    requireFields(payload, ["title", "format", "abstractText"]);
+    if (String(payload.submissionMode || "").toLowerCase() === "upload") {
+      requireFields(payload, ["format", "uploadedAbstractFileName"]);
+      if (!payload.uploadedAbstractDriveUrl && !payload.uploadedAbstractDriveFileId) {
+        throw new Error("Uploaded abstract file reference is missing.");
+      }
+      return;
+    }
+    requireFields(payload, ["title", "format", "keywords", "abstractText"]);
+    if (!payload.authors && !payload.coauthors) throw new Error("Missing required field: authors");
     if (String(payload.abstractText).length > 2500) throw new Error("Abstract exceeds 2500 characters.");
   }
   if (section === "scholarship") {

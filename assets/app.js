@@ -8,6 +8,9 @@
   };
   var ENDPOINT_PENDING_MESSAGE =
     "Registration is not open yet. The secure application system is being connected by the organising team.";
+  var ABSTRACT_UPLOAD_DOCUMENT_TYPE = "Abstract document";
+  var ABSTRACT_MAX_FILE_SIZE = 10 * 1024 * 1024;
+  var ABSTRACT_ALLOWED_EXTENSIONS = /\.(pdf|doc|docx)$/i;
 
   var data = window.CONFERENCE_DATA;
   var state = loadState();
@@ -393,6 +396,8 @@
     var supportForm = qs("#support-form");
     var uploadForm = qs("#upload-form");
 
+    setupAbstractMode(abstractForm);
+
     accountForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       if (!isEndpointConfigured()) {
@@ -419,7 +424,7 @@
     });
 
     registrationForm.addEventListener("submit", handleNamedSubmit("submitRegistration", registrationForm, "registration", "Registration submitted"));
-    abstractForm.addEventListener("submit", handleNamedSubmit("submitAbstract", abstractForm, "abstract", "Abstract submitted"));
+    abstractForm.addEventListener("submit", handleAbstractSubmit);
     supportForm.addEventListener("submit", handleNamedSubmit("submitScholarship", supportForm, "support", "Travel support request submitted"));
 
     qsa("[data-save-draft]").forEach(function (button) {
@@ -431,7 +436,7 @@
         var form = qs("#" + button.dataset.saveDraft);
         var key = form.id.replace("-form", "");
         if (key === "support") key = "support";
-        var values = serialiseForm(form);
+        var values = key === "abstract" ? serialiseAbstractDraft(form) : serialiseForm(form);
         apiRequest("saveDraft", { section: key, values: values })
           .then(function () {
             state[key] = values;
@@ -462,12 +467,13 @@
         file: await fileToPayload(file)
       };
       try {
-        await apiRequest("uploadFile", payload);
+        var result = await apiRequest("uploadFile", payload);
         state.uploads.push({
           name: file.name,
           size: file.size,
           type: payload.documentType,
-          date: new Date().toLocaleString()
+          date: new Date().toLocaleString(),
+          url: result.driveUrl || ""
         });
         addStatusEvent("File uploaded", payload.documentType + ": " + file.name);
         saveState();
@@ -477,6 +483,158 @@
         notify(error.message);
       }
     });
+  }
+
+  function setupAbstractMode(form) {
+    if (!form) return;
+    var radios = qsa('input[name="submissionMode"]', form);
+
+    function syncMode() {
+      var mode = getAbstractMode(form);
+      qsa("[data-abstract-mode-panel]", form).forEach(function (panel) {
+        panel.hidden = panel.dataset.abstractModePanel !== mode;
+      });
+      qsa("[data-abstract-mode-option]", form).forEach(function (option) {
+        option.classList.toggle("is-selected", option.dataset.abstractModeOption === mode);
+      });
+    }
+
+    radios.forEach(function (radio) {
+      radio.addEventListener("change", syncMode);
+    });
+    form.addEventListener("reset", function () {
+      window.setTimeout(syncMode, 0);
+    });
+    syncMode();
+  }
+
+  function getAbstractMode(form) {
+    var selected = qs('input[name="submissionMode"]:checked', form);
+    return selected && selected.value === "upload" ? "upload" : "paste";
+  }
+
+  function serialiseAbstractForm(form) {
+    var values = serialiseForm(form);
+    var mode = getAbstractMode(form);
+    if (mode === "upload") {
+      return {
+        submissionMode: "upload",
+        format: values.uploadedFormat || ""
+      };
+    }
+    return {
+      submissionMode: "paste",
+      title: values.title || "",
+      format: values.format || "",
+      keywords: values.keywords || "",
+      authors: values.authors || "",
+      abstractText: values.abstractText || ""
+    };
+  }
+
+  function serialiseAbstractDraft(form) {
+    var values = serialiseAbstractForm(form);
+    if (values.submissionMode === "upload") {
+      values.title = "Uploaded abstract document";
+      values.keywords = "Included in uploaded abstract document";
+      values.authors = "Included in uploaded abstract document";
+      values.abstractText = "Applicant selected upload mode. The abstract document is saved when submitted.";
+    }
+    return values;
+  }
+
+  async function handleAbstractSubmit(event) {
+    event.preventDefault();
+    var form = event.currentTarget;
+    if (!isEndpointConfigured()) {
+      notify(ENDPOINT_PENDING_MESSAGE);
+      return;
+    }
+
+    var mode = getAbstractMode(form);
+    try {
+      if (mode === "upload") {
+        await submitUploadedAbstract(form);
+      } else {
+        await submitPastedAbstract(form);
+      }
+    } catch (error) {
+      notify(error.message);
+    }
+  }
+
+  async function submitPastedAbstract(form) {
+    var values = serialiseAbstractForm(form);
+    if (!values.title) throw new Error("Add the abstract title.");
+    if (!values.format) throw new Error("Select a presentation format.");
+    if (!values.keywords) throw new Error("Add abstract keywords.");
+    if (!values.authors) throw new Error("Add the authors and co-authors.");
+    if (!values.abstractText) throw new Error("Paste the abstract text.");
+    if (values.abstractText.length > 2500) throw new Error("Abstract exceeds 2500 characters.");
+
+    await apiRequest("submitAbstract", values);
+    state.abstract = values;
+    state.status = "Submitted";
+    addStatusEvent("Abstract submitted", "Structured abstract details recorded.");
+    saveState();
+    form.reset();
+    notify("Abstract submitted. Please check your email for confirmation.");
+  }
+
+  async function submitUploadedAbstract(form) {
+    var values = serialiseAbstractForm(form);
+    var fileInput = qs('[name="abstractFile"]', form);
+    var file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+    if (!values.format) throw new Error("Select a presentation format.");
+    if (!file) throw new Error("Choose your complete abstract document.");
+    if (!ABSTRACT_ALLOWED_EXTENSIONS.test(file.name || "")) {
+      throw new Error("Upload the abstract as PDF, DOC, or DOCX.");
+    }
+    if (Number(file.size || 0) > ABSTRACT_MAX_FILE_SIZE) {
+      throw new Error("The abstract document exceeds the 10 MB limit.");
+    }
+
+    notify("Uploading abstract document...");
+    var uploadResult = await apiRequest("uploadFile", {
+      documentType: ABSTRACT_UPLOAD_DOCUMENT_TYPE,
+      file: await fileToPayload(file)
+    });
+    var payload = buildUploadedAbstractPayload(values, file, uploadResult);
+    await apiRequest("submitAbstract", payload);
+
+    state.abstract = payload;
+    state.status = "Submitted";
+    state.uploads.push({
+      name: file.name,
+      size: file.size,
+      type: ABSTRACT_UPLOAD_DOCUMENT_TYPE,
+      date: new Date().toLocaleString(),
+      url: uploadResult.driveUrl || ""
+    });
+    addStatusEvent("Abstract submitted", "Uploaded abstract document recorded: " + file.name);
+    saveState();
+    form.reset();
+    notify("Abstract submitted. Your uploaded document has been recorded; please check your email.");
+  }
+
+  function buildUploadedAbstractPayload(values, file, uploadResult) {
+    var driveUrl = uploadResult.driveUrl || "";
+    var driveReference = driveUrl || uploadResult.driveFileId || "Drive upload recorded";
+    return {
+      submissionMode: "upload",
+      title: "Uploaded abstract document: " + file.name,
+      format: values.format,
+      keywords: "Included in uploaded abstract document",
+      authors: "Included in uploaded abstract document",
+      abstractText: "Complete abstract document uploaded to Google Drive: " + driveReference,
+      uploadedAbstractFileName: file.name,
+      uploadedAbstractMimeType: file.type || "application/octet-stream",
+      uploadedAbstractSize: String(file.size || 0),
+      uploadedAbstractDriveFileId: uploadResult.driveFileId || "",
+      uploadedAbstractDriveUrl: driveUrl,
+      uploadedAbstractDocumentType: ABSTRACT_UPLOAD_DOCUMENT_TYPE
+    };
   }
 
   function handleNamedSubmit(action, form, key, successTitle) {
@@ -539,7 +697,7 @@
 
     setText("[data-progress-account]", percentComplete(state.account || {}, ["name", "email", "institution", "country"]) + "%");
     setText("[data-progress-registration]", percentComplete(state.registration || {}, ["attendanceType", "theme", "sponsorshipCategory", "contribution"]) + "%");
-    setText("[data-progress-abstract]", percentComplete(state.abstract || {}, ["title", "format", "abstractText"]) + "%");
+    setText("[data-progress-abstract]", abstractProgress(state.abstract || {}) + "%");
     setText("[data-progress-support]", percentComplete(state.support || {}, ["supportType", "motivation"]) + "%");
 
     if (timeline) {
@@ -569,6 +727,19 @@
     }
   }
 
+  function abstractProgress(values) {
+    if (!values) return 0;
+    if (values.submissionMode === "upload") {
+      return percentComplete(values, ["format", "uploadedAbstractFileName", "uploadedAbstractDriveUrl"]);
+    }
+    var required = ["title", "format", "keywords", "abstractText"];
+    var filled = required.filter(function (key) {
+      return values[key] && String(values[key]).trim().length > 0;
+    }).length;
+    if (values.authors || values.coauthors) filled += 1;
+    return Math.round((filled / 5) * 100);
+  }
+
   function renderUploads() {
     var list = qs("[data-uploaded-list]");
     if (!list) return;
@@ -587,7 +758,11 @@
           Math.round(upload.size / 1024) +
           " KB<br><small>" +
           escapeHtml(upload.date) +
-          "</small></li>"
+          "</small>" +
+          (upload.url
+            ? '<br><a href="' + escapeHtml(upload.url) + '" target="_blank" rel="noopener">Open uploaded file</a>'
+            : "") +
+          "</li>"
         );
       })
       .join("");

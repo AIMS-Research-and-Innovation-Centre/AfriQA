@@ -436,33 +436,92 @@
                   <h3 id="abstract-title">Poster or talk proposal</h3>
                 </div>
               </div>
-              <form id="abstract-form" class="form-grid" autocomplete="off">
-                <label class="full">
-                  Title
-                  <input name="title" required placeholder="Concise scientific title" />
-                </label>
-                <label>
-                  Presentation format
-                  <select name="format" required>
-                    <option value="">Select one</option>
-                    <option>Poster</option>
-                    <option>Contributed talk</option>
-                    <option>Young talent talk</option>
-                    <option>White paper project</option>
-                  </select>
-                </label>
-                <label>
-                  Keywords
-                  <input name="keywords" placeholder="quantum sensing, QML, photonics" />
-                </label>
-                <label class="full">
-                  Abstract
-                  <textarea name="abstractText" rows="8" maxlength="2500" required placeholder="Maximum 2500 characters."></textarea>
-                </label>
-                <label class="full">
-                  Co-authors
-                  <textarea name="coauthors" rows="3" placeholder="Name, affiliation, country"></textarea>
-                </label>
+              <form id="abstract-form" class="form-grid abstract-form" autocomplete="off">
+                <fieldset class="abstract-mode full" aria-describedby="abstract-mode-note">
+                  <legend>Choose one abstract submission method</legend>
+                  <p id="abstract-mode-note">
+                    Submit either structured details in the portal or a single complete document. The selected method
+                    must include the title, presentation format, keywords, presenting author, co-authors, and abstract text.
+                  </p>
+                  <label class="abstract-option" data-abstract-mode-option="paste">
+                    <input id="abstract-mode-paste" type="radio" name="submissionMode" value="paste" checked />
+                    <span>
+                      <strong>Paste structured abstract details</strong>
+                      <small>Enter the title, format, keywords, author details, and abstract text field by field.</small>
+                    </span>
+                  </label>
+                  <label class="abstract-option" data-abstract-mode-option="upload">
+                    <input id="abstract-mode-upload" type="radio" name="submissionMode" value="upload" />
+                    <span>
+                      <strong>Upload complete abstract document</strong>
+                      <small>Submit a prepared PDF, DOC, or DOCX file that contains all required abstract details.</small>
+                    </span>
+                  </label>
+                </fieldset>
+
+                <div class="abstract-mode-panel full" data-abstract-mode-panel="paste">
+                  <div class="abstract-panel-intro full">
+                    <h4>Structured abstract details</h4>
+                    <p>Use this option when you want to paste the abstract directly into the AfriQA portal.</p>
+                  </div>
+                  <label class="full">
+                    Title
+                    <input name="title" placeholder="Concise scientific title" />
+                  </label>
+                  <label>
+                    Presentation format
+                    <select name="format">
+                      <option value="">Select one</option>
+                      <option>Poster</option>
+                      <option>Contributed talk</option>
+                      <option>Young talent talk</option>
+                      <option>White paper project</option>
+                    </select>
+                  </label>
+                  <label>
+                    Keywords
+                    <input name="keywords" placeholder="Separate keywords with commas" />
+                  </label>
+                  <label class="full">
+                    Authors and co-authors
+                    <textarea name="authors" rows="3" placeholder="Full names, affiliations, and countries"></textarea>
+                  </label>
+                  <label class="full">
+                    Abstract text
+                    <textarea name="abstractText" rows="8" maxlength="2500" placeholder="Maximum 2500 characters."></textarea>
+                  </label>
+                </div>
+
+                <div class="abstract-mode-panel full" data-abstract-mode-panel="upload" hidden>
+                  <div class="abstract-panel-intro full">
+                    <h4>Complete abstract document</h4>
+                    <p>Use this option when the abstract has already been prepared as a single document.</p>
+                  </div>
+                  <div class="abstract-upload-note full">
+                    <strong>Your document must include:</strong>
+                    <ul class="abstract-requirements">
+                      <li>Title and selected presentation format</li>
+                      <li>Keywords</li>
+                      <li>Presenting author and all co-authors, with affiliations and countries</li>
+                      <li>Abstract text</li>
+                    </ul>
+                  </div>
+                  <label>
+                    Presentation format
+                    <select name="uploadedFormat">
+                      <option value="">Select one</option>
+                      <option>Poster</option>
+                      <option>Contributed talk</option>
+                      <option>Young talent talk</option>
+                      <option>White paper project</option>
+                    </select>
+                  </label>
+                  <label class="file-drop full">
+                    <input name="abstractFile" type="file" accept=".pdf,.doc,.docx" />
+                    <span>Choose your complete abstract document</span>
+                    <small>PDF, DOC, or DOCX only. Maximum: 10 MB.</small>
+                  </label>
+                </div>
                 <div class="form-actions">
                   <button class="button secondary" type="button" data-save-draft="abstract-form" data-requires-endpoint>Save draft</button>
                   <button class="button primary" type="submit" data-requires-endpoint>Submit abstract</button>
@@ -510,7 +569,7 @@
               <div class="panel-header">
                 <div>
                   <p class="eyebrow">File uploads</p>
-                  <h3 id="uploads-title">CV, passport, abstract, and supporting documents</h3>
+                  <h3 id="uploads-title">CV, passport, and supporting documents</h3>
                 </div>
               </div>
               <form id="upload-form" class="upload-zone" autocomplete="off">
@@ -520,14 +579,13 @@
                     <option value="">Select one</option>
                     <option>CV</option>
                     <option>Passport or ID</option>
-                    <option>Abstract PDF</option>
                     <option>Support letter</option>
                     <option>Other supporting document</option>
                   </select>
                 </label>
                 <label class="file-drop">
                   <input name="file" type="file" required accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
-                  <span>Choose a file or drop it here</span>
+                  <span>Choose a file</span>
                   <small>PDF, DOCX, PNG, or JPG. Recommended maximum: 10 MB.</small>
                 </label>
                 <button class="button primary" type="submit" data-requires-endpoint>Upload document</button>
